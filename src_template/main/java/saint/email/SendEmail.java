@@ -3,10 +3,6 @@ package saint.email;
 import java.io.File;
 import java.io.IOException;
 
-/**
- *
- * @author tiagorlampert
- */
 public class SendEmail {
 
     private String smtp;
