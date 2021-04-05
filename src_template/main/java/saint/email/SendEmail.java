@@ -147,4 +147,14 @@ public class SendEmail {
         }
     }
     
+    public SendEmail(String smtp, String email_from, String email_password, String port, boolean ssl, boolean tls, boolean debug){
+        this.smtp = smtp;
+        this.email_from = email_from;
+        this.email_password = email_password;
+        this.port = port;
+        this.ssl = ssl;
+        this.tls = tls;
+        this.debug = debug;
+
+    }
 }
